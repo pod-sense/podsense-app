@@ -20,6 +20,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:$viewPager2Version"
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "androidx.core:core-splashscreen:1.0.0"
+    implementation "androidx.palette:palette:$paletteVersion"
     implementation "org.apache.commons:commons-lang3:$commonslangVersion"
     implementation "commons-io:commons-io:$commonsioVersion"
 

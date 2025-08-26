@@ -3,8 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:squareImageView="http://schemas.android.com/apk/de.danoeh.antennapod"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="96dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="4dp"
     android:clipToPadding="false"
     android:clipToOutline="false"
@@ -12,22 +14,73 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="140dp"
+        android:layout_height="120dp"
+        android:clipChildren="false"
         app:cardBackgroundColor="@color/non_square_icon_background"
         app:cardCornerRadius="16dp"
         app:cardPreventCornerOverlap="false"
-        app:cardElevation="2dp">
+        app:cardElevation="4dp">
 
-        <de.danoeh.antennapod.ui.common.SquareImageView
-            android:id="@+id/discovery_cover"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="96dp"
-            android:elevation="4dp"
-            android:outlineProvider="bounds"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:background="?android:attr/colorBackground"
-            squareImageView:direction="height" />
+            android:layout_height="match_parent"
+            android:clipChildren="false">
+
+            <!-- Extended colored background layer reaching to button area -->
+            <View
+                android:id="@+id/color_background"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_gravity="top"
+                android:background="@color/medium_gray" />
+
+            <!-- Podcast cover with padding to show colored background -->
+            <de.danoeh.antennapod.ui.common.SquareImageView
+                android:id="@+id/discovery_cover"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="top"
+                android:layout_margin="6dp"
+                android:layout_marginBottom="16dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:elevation="4dp"
+                android:outlineProvider="bounds"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:background="@drawable/rounded_corners_8dp"
+                android:clipToOutline="true"
+                squareImageView:direction="height" />
+
+            <!-- Play button at bottom left edge -->
+            <ImageButton
+                android:id="@+id/play_button"
+                android:layout_width="36dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="4dp"
+                android:background="@drawable/bg_pill_gray_translucent"
+                android:src="@drawable/ic_play_24dp"
+                android:contentDescription="@string/play_label"
+                android:scaleType="centerInside"
+                android:padding="5dp"
+                app:tint="@color/white" />
+
+            <!-- Options button (horizontal dots) at bottom right edge -->
+            <ImageButton
+                android:id="@+id/options_button"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="4dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/dots_horizontal"
+                android:contentDescription="@string/overflow_more"
+                android:scaleType="centerInside"
+                android:padding="5dp"
+                app:tint="@color/white" />
+
+        </FrameLayout>
 
     </androidx.cardview.widget.CardView>
 

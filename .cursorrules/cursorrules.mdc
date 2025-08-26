@@ -1,0 +1,247 @@
+# AntennaPod Development Rules & Guidelines
+
+This document outlines key architectural patterns, conventions, and potential pitfalls in the AntennaPod codebase. Following these rules will help maintain code quality and prevent common errors.
+
+## Table of Contents
+1. [Project Structure](#1-project-structure)
+2. [UI Development & Resource Naming](#2-ui-development--resource-naming)
+3. [Core Patterns & Classes](#3-core-patterns--classes)
+4. [Build Process & Testing](#4-build-process--testing)
+5. [UI/UX Development Guidelines](#5-uiux-development-guidelines)
+6. [Color & Palette Management](#6-color--palette-management)
+7. [Common Pitfalls](#7-common-pitfalls)
+8. [Code Quality Standards](#8-code-quality-standards)
+
+### 1. Project Structure
+
+The project is divided into multiple Gradle modules. Here are some of the most important ones:
+- `app`: The main application module, containing most of the UI and Activity classes.
+- `model`: Defines the core data models for the app (e.g., `FeedItem`, `FeedMedia`).
+- `playback`: Contains the services and logic for handling audio playback.
+- `net`: Includes networking code for downloading feeds, episodes, and interacting with APIs.
+- `ui/common`: Contains shared UI resources like drawables, styles, and attributes. **Always check this module for existing resources before creating new ones.**
+
+### 2. UI Development & Resource Naming
+
+**A series of build failures occurred due to incorrect resource naming. Be meticulous here.**
+
+- **Verify Resource Names**: Before using a resource (`@drawable`, `@string`, `@attr`), physically check that it exists in the project. Do not assume its name.
+- **Shared Resources**: Common icons, colors, and attributes are in `ui/common/src/main/res/`. For example, the correct attribute for themed icons is `?attr/action_icon_color`.
+- **Data Binding**: The project uses data binding. The generated binding class names are derived directly from the layout file names. For example, `feeditemlist_item.xml` generates `FeeditemlistItemBinding`, while `feeditemlist_wide_item.xml` would generate `FeeditemlistWideItemBinding`. Using the wrong one will cause compilation errors.
+
+### 3. Core Patterns & Classes
+
+- **Episode Lists**:
+    - To display a list of episodes, always use the shared `EpisodeItemViewHolder`. It is designed to work with the `feeditemlist_item.xml` layout and handles the complex logic of binding `FeedItem` data to the views.
+    - **Do not create new, custom `ViewHolder` classes inside adapters for this purpose.**
+    - Adapters for episode lists should extend `RecyclerView.Adapter<EpisodeItemViewHolder>`.
+
+- **Starting Playback**:
+    - To stream or play an episode, use the `PlaybackServiceStarter`.
+    - Its constructor requires a `Playable` object. **Do not pass a `FeedItem` directly.** The correct object is the `FeedMedia` contained within the `FeedItem`, which you can get by calling `item.getMedia()`.
+
+- **Showing the Subscription Screen**:
+    - To show the podcast details/subscribe screen for a given feed URL, use the `OnlineFeedviewActivityStarter` class.
+    - It is instantiated via `new OnlineFeedviewActivityStarter(context, feedUrl)`.
+
+- **Handling Background Tasks**:
+    - When performing background tasks in a Fragment using RxJava, use a `CompositeDisposable`. Add each new `Disposable` to it, and call `disposable.clear()` (or `dispose()`) in the `onStop()` or `onDestroyView()` lifecycle method to prevent memory leaks.
+
+### 4. Common Pitfalls
+
+- **Modifying Shared Layouts**: Be extremely careful when changing a shared layout file like `feeditemlist_item.xml`. These layouts are often used in unexpected places (e.g., dialogs like `SwipeActionsDialog`). A change can cause a cascade of build failures in other parts of the app.
+- **Incorrect Imports**: Many of the modules have similar package names. After making changes, double-check that you are importing classes from the correct packages (e.g., `de.danoeh.antennapod.model.feed.FeedItem`, not a non-existent `core` package).
+
+### 4. Build Process & Testing
+
+**CRITICAL: Always build and test after every significant change to catch errors early.**
+
+#### 4.1 Standard Build Process
+```bash
+# Navigate to project root
+cd /path/to/AntennaPod-develop
+
+# Clean build (use when switching branches or major changes)
+./gradlew clean
+
+# Standard debug build - USE THIS AFTER EVERY CHANGE
+./gradlew assembleDebug
+
+# For release builds
+./gradlew assembleRelease
+```
+
+#### 4.2 Build Verification Workflow
+**Follow this process religiously after every change:**
+
+1. **Make your changes** (layouts, code, resources)
+2. **Immediate build check**: `./gradlew assembleDebug`
+3. **Review build output** for warnings and errors
+4. **Fix any compilation errors** before proceeding
+5. **Test on device/emulator** if UI changes were made
+6. **Commit only after successful build**
+
+#### 4.3 Common Build Error Patterns
+- **Resource not found**: Verify resource names in `ui/common/src/main/res/`
+- **Import errors**: Check package names, especially after refactoring
+- **Layout compilation**: XML syntax errors or missing attributes
+- **Dependency issues**: Module dependencies in `build.gradle` files
+- **ProGuard/R8 issues**: Check `proguard.cfg` for keep rules
+
+#### 4.4 Build Performance Tips
+- Use `--parallel` flag for faster builds: `./gradlew assembleDebug --parallel`
+- Enable Gradle daemon: Add `org.gradle.daemon=true` to `gradle.properties`
+- Use build cache: `./gradlew assembleDebug --build-cache`
+
+#### 4.5 Debugging Build Issues
+```bash
+# Verbose output for debugging
+./gradlew assembleDebug --info
+
+# Stack traces for errors
+./gradlew assembleDebug --stacktrace
+
+# Debug dependency resolution
+./gradlew assembleDebug --debug
+```
+
+### 5. UI/UX Development Guidelines
+
+#### 5.1 Layout Best Practices
+- **Always use `fitCenter` for podcast artwork** to ensure images fit within frames
+- **Add `android:adjustViewBounds="true"` to ImageViews** for proper scaling
+- **Use `android:clipChildren="false"`** on parent containers when content extends beyond bounds
+- **Apply consistent corner radius** (8dp for images, 12dp for cards)
+- **Maintain proper elevation hierarchy** (cards: 4dp, elevated elements: 8dp+)
+
+#### 5.2 Responsive Design
+- **Support multiple screen densities** with appropriate dp values
+- **Use `wrap_content` and `match_parent` judiciously**
+- **Test on different screen sizes** (phones, tablets)
+- **Ensure touch targets are minimum 48dp** for accessibility
+
+#### 5.3 Card Design Patterns
+```xml
+<!-- Standard card structure -->
+<com.google.android.material.card.MaterialCardView
+    android:layout_width="180dp"
+    android:layout_height="160dp"
+    android:clipChildren="false"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false">
+        
+        <!-- Color background for palette -->
+        <View android:id="@+id/color_background" />
+        
+        <!-- Artwork with rounded corners -->
+        <ImageView
+            android:background="@drawable/rounded_corners_8dp"
+            android:clipToOutline="true"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+            
+        <!-- Overlay buttons -->
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>
+```
+
+### 6. Color & Palette Management
+
+#### 6.1 Dynamic Color Extraction
+The app uses Android's Palette API to extract colors from podcast artwork:
+
+```java
+// In adapters, always set fallback color first
+int initialColor = ColorUtils.extractBackgroundColor(null, podcast.getFeedUrl());
+holder.colorBackground.setBackgroundColor(initialColor);
+
+// Then load image with palette extraction
+Glide.with(context)
+    .load(podcast.getImageUrl())
+    .transform(new PaletteTransformation(palette -> {
+        int backgroundColor = ColorUtils.extractBackgroundColor(palette, podcast.getFeedUrl());
+        holder.colorBackground.setBackgroundColor(backgroundColor);
+    }))
+    .into(holder.imageView);
+```
+
+#### 6.2 Color Utility Guidelines
+- **Use `ColorUtils.extractBackgroundColor()`** for consistent color extraction
+- **Always provide fallback seeds** (use feed URL or unique identifier)
+- **Prefer vibrant colors over muted** for better visual impact
+- **Apply appropriate transparency** (75% opacity for backgrounds)
+
+#### 6.3 Palette Extension Best Practices
+- **Extend palette backgrounds beyond card boundaries** for immersive effect
+- **Ensure buttons sit on colored backgrounds** for visual cohesion
+- **Use `android:clipChildren="false"` on parent containers** to allow overflow
+- **Test with various podcast artwork** to ensure consistent appearance
+
+### 7. Common Pitfalls
+
+#### 7.1 Resource Management
+- **Modifying Shared Layouts**: Be extremely careful when changing shared layout files like `feeditemlist_item.xml`. These layouts are often used in unexpected places (e.g., dialogs like `SwipeActionsDialog`). A change can cause a cascade of build failures.
+- **Incorrect Imports**: Many modules have similar package names. Double-check imports after changes (e.g., `de.danoeh.antennapod.model.feed.FeedItem`, not a non-existent `core` package).
+- **Resource Naming**: Always verify resource names exist before using them. Check `ui/common/src/main/res/` for shared resources.
+
+#### 7.2 Layout Issues
+- **Image scaling problems**: Always use `fitCenter` with `adjustViewBounds="true"`
+- **Clipping issues**: Use `clipChildren="false"` when content extends beyond bounds
+- **Button positioning**: Use `layout_gravity` for consistent button placement
+- **Color fallbacks**: Always set initial colors before async palette extraction
+
+#### 7.3 Performance Considerations
+- **Glide transformations**: Use efficient transformations, avoid creating multiple instances
+- **RecyclerView optimization**: Implement proper ViewHolder patterns
+- **Memory leaks**: Dispose of RxJava subscriptions in lifecycle methods
+- **Build performance**: Use Gradle daemon and parallel builds
+
+### 8. Code Quality Standards
+
+#### 8.1 Java/Kotlin Guidelines
+- **Use proper null checks** especially with Palette API callbacks
+- **Implement error handling** for image loading and color extraction
+- **Follow Android lifecycle patterns** for Fragment and Activity management
+- **Use appropriate threading** for background operations
+
+#### 8.2 XML Guidelines
+- **Consistent indentation** (4 spaces)
+- **Meaningful IDs** that describe the element's purpose
+- **Group related attributes** (layout, appearance, behavior)
+- **Comment complex layouts** for future maintainers
+
+#### 8.3 Testing Requirements
+- **Build verification**: `./gradlew assembleDebug` after every change
+- **UI testing**: Verify layouts on multiple screen sizes
+- **Color testing**: Test palette extraction with various artwork
+- **Edge case handling**: Test with missing images, network failures
+
+#### 8.4 Git Workflow
+- **Commit only after successful builds**
+- **Write descriptive commit messages**
+- **Test major changes on clean builds**
+- **Review your own changes before committing**
+
+---
+
+## Quick Reference Commands
+
+```bash
+# Essential build commands
+./gradlew clean                    # Clean build artifacts
+./gradlew assembleDebug           # Build debug APK (USE AFTER EVERY CHANGE)
+./gradlew assembleRelease         # Build release APK
+./gradlew assembleDebug --info    # Verbose build output
+
+# Development workflow
+./gradlew assembleDebug --parallel --build-cache    # Fast incremental build
+./gradlew lintDebug                                  # Run lint checks
+./gradlew testDebugUnitTest                         # Run unit tests
+```
+
+By following these comprehensive guidelines, we can ensure the codebase remains stable, maintainable, and consistent as we continue to build out new features. The build-first mentality is crucial for catching errors early and maintaining code quality.

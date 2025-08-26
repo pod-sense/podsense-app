@@ -19,7 +19,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="@string/home_label" />
+            app:title="@string/home_label"
+            app:titleTextAppearance="@style/App.Title.Headline5" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -59,7 +60,7 @@
                     android:text="@string/home_welcome_title"
                     android:layout_marginBottom="8dp"
                     android:textAlignment="center"
-                    android:textAppearance="?attr/textAppearanceHeadline6" />
+                    android:textAppearance="@style/App.Title.Headline6" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -97,219 +98,214 @@
                 tools:ignore="UselessParent">
 
                 <!-- Popular Shows Section -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/popular_shows_card"
+                <LinearLayout
                     android:layout_columnSpan="2"
                     android:layout_gravity="fill_horizontal"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
-                    <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp">
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <RelativeLayout
-                            android:layout_width="match_parent"
+                        android:layout_marginBottom="8dp"
+                        android:paddingHorizontal="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/popular_shows_label"
-                                android:textAppearance="?attr/textAppearanceHeadline6"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"/>
-                            <ImageView
-                                android:id="@+id/popular_shows_arrow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_arrow_right_white"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
-                        </RelativeLayout>
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/popular_shows_recycler"
-                            android:layout_width="match_parent"
+                            android:text="@string/popular_shows_label"
+                            android:textAppearance="@style/App.Title.Headline6"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"/>
+                        <ImageView
+                            android:id="@+id/popular_shows_arrow"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:src="@drawable/ic_arrow_right_white"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                    </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/popular_shows_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </LinearLayout>
 
                 <!-- News Section -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/news_card"
+                <LinearLayout
                     android:layout_columnSpan="2"
                     android:layout_gravity="fill_horizontal"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
-                    <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp">
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <RelativeLayout
-                            android:layout_width="match_parent"
+                        android:layout_marginBottom="8dp"
+                        android:paddingHorizontal="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/news_label"
-                                android:textAppearance="?attr/textAppearanceHeadline6"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"/>
-                            <ImageView
-                                android:id="@+id/news_arrow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_arrow_right_white"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
-                        </RelativeLayout>
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/news_recycler"
-                            android:layout_width="match_parent"
+                            android:text="@string/news_label"
+                            android:textAppearance="@style/App.Title.Headline6"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"/>
+                        <ImageView
+                            android:id="@+id/news_arrow"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:src="@drawable/ic_arrow_right_white"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                    </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/news_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </LinearLayout>
 
                 <!-- Comedy Section -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/comedy_card"
+                <LinearLayout
                     android:layout_columnSpan="2"
                     android:layout_gravity="fill_horizontal"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
-                    <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp">
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <RelativeLayout
-                            android:layout_width="match_parent"
+                        android:layout_marginBottom="8dp"
+                        android:paddingHorizontal="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/comedy_label"
-                                android:textAppearance="?attr/textAppearanceHeadline6"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"/>
-                            <ImageView
-                                android:id="@+id/comedy_arrow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_arrow_right_white"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
-                        </RelativeLayout>
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/comedy_recycler"
-                            android:layout_width="match_parent"
+                            android:text="@string/comedy_label"
+                            android:textAppearance="@style/App.Title.Headline6"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"/>
+                        <ImageView
+                            android:id="@+id/comedy_arrow"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:src="@drawable/ic_arrow_right_white"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                    </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/comedy_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </LinearLayout>
 
                 <!-- Technology Section -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/technology_card"
+                <LinearLayout
                     android:layout_columnSpan="2"
                     android:layout_gravity="fill_horizontal"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
-                    <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp">
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <RelativeLayout
-                            android:layout_width="match_parent"
+                        android:layout_marginBottom="8dp"
+                        android:paddingHorizontal="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/technology_label"
-                                android:textAppearance="?attr/textAppearanceHeadline6"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"/>
-                            <ImageView
-                                android:id="@+id/technology_arrow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_arrow_right_white"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
-                        </RelativeLayout>
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/technology_recycler"
-                            android:layout_width="match_parent"
+                            android:text="@string/technology_label"
+                            android:textAppearance="@style/App.Title.Headline6"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"/>
+                        <ImageView
+                            android:id="@+id/technology_arrow"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:src="@drawable/ic_arrow_right_white"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                    </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/technology_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </LinearLayout>
 
                 <!-- Business Section -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/business_card"
+                <LinearLayout
                     android:layout_columnSpan="2"
                     android:layout_gravity="fill_horizontal"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
-                    <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp">
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <RelativeLayout
-                            android:layout_width="match_parent"
+                        android:layout_marginBottom="8dp"
+                        android:paddingHorizontal="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/business_label"
-                                android:textAppearance="?attr/textAppearanceHeadline6"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"/>
-                            <ImageView
-                                android:id="@+id/business_arrow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_arrow_right_white"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
-                        </RelativeLayout>
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/business_recycler"
-                            android:layout_width="match_parent"
+                            android:text="@string/business_label"
+                            android:textAppearance="@style/App.Title.Headline6"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"/>
+                        <ImageView
+                            android:id="@+id/business_arrow"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:src="@drawable/ic_arrow_right_white"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                    </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/business_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:clipToPadding="false"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </LinearLayout>
 
                 <!-- Subscriptions Section -->
                 <com.google.android.material.card.MaterialCardView
@@ -327,7 +323,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/subscriptions_label"
-                            android:textAppearance="?attr/textAppearanceHeadline6"/>
+                            android:textAppearance="@style/App.Title.Headline6"/>
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/subscriptions_grid"
                             android:layout_width="match_parent"

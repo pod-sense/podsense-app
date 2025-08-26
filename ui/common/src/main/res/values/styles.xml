@@ -29,6 +29,8 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="toolbarStyle">@style/Style.AntennaPod.Toolbar</item>
         <item name="preferenceTheme">@style/AppPreferenceThemeOverlay</item>
+        <item name="textAppearanceHeadline5">@style/App.Title.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/App.Title.Headline6</item>
     </style>
 
     <style name="Theme.AntennaPod.Light" parent="Theme.AntennaPod.Dynamic.Light">
@@ -74,23 +76,33 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="toolbarStyle">@style/Style.AntennaPod.Toolbar</item>
         <item name="preferenceTheme">@style/AppPreferenceThemeOverlay</item>
+        <item name="textAppearanceHeadline5">@style/App.Title.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/App.Title.Headline6</item>
     </style>
 
     <style name="Theme.AntennaPod.Dark" parent="Theme.AntennaPod.Dynamic.Dark">
         <item name="isMaterial3DynamicColorApplied">false</item>
-        <item name="colorPrimary">@color/accent_dark</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorAccent">@color/accent_dark</item>
-        <item name="colorSecondary">@color/accent_dark</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="colorPrimaryDark">@color/accent_dark</item>
-        <item name="colorPrimaryContainer">#29374E</item>
-        <item name="colorOnPrimaryContainer">@color/white</item>
-        <item name="android:colorBackground">@color/background_darktheme</item>
-        <item name="colorSurface">@color/background_darktheme</item>
-        <item name="colorSurfaceVariant">#2F3B4F</item>
-        <item name="colorSurfaceContainer">#1C2024</item>
-        <item name="colorSecondaryContainer">#2F3B4F</item>
+        <!-- Carbon Fiber Palette -->
+        <item name="colorPrimary">@color/electric_blue_accent</item>
+        <item name="colorOnPrimary">@color/carbon_background</item>
+        <item name="colorAccent">@color/electric_blue_accent</item>
+        <item name="colorSecondary">@color/electric_blue_accent</item>
+        <item name="colorOnSecondary">@color/carbon_background</item>
+        <item name="colorPrimaryDark">@color/electric_blue_accent</item>
+        <item name="android:colorBackground">@color/carbon_background</item>
+        <item name="colorSurface">@color/carbon_surface</item>
+        <item name="android:textColorPrimary">@color/off_white_text</item>
+        <item name="android:textColorSecondary">@color/medium_gray_text</item>
+
+        <!-- Specific Overrides -->
+        <item name="background_color">@color/carbon_background</item>
+        <item name="background_elevated">@color/carbon_surface</item>
+        <item name="action_icon_color">@color/off_white_text</item>
+        <item name="colorPrimaryContainer">@color/carbon_surface</item>
+        <item name="colorOnPrimaryContainer">@color/off_white_text</item>
+        <item name="colorSurfaceVariant">@color/carbon_surface</item>
+        <item name="colorSurfaceContainer">@color/carbon_background</item>
+        <item name="colorSecondaryContainer">@color/carbon_surface</item>
     </style>
 
     <style name="Theme.AntennaPod.Dynamic.TrueBlack" parent="Theme.AntennaPod.Dynamic.Dark">
@@ -243,6 +255,20 @@
         <item name="colorControlNormal">?attr/colorOnSurface</item>
     </style>
 
+    <style name="App" />
+
+    <style name="App.Title" />
+
+    <style name="App.Title.Headline5">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="App.Title.Headline6">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="Theme.AntennaPod.VideoPlayer" parent="@style/Theme.AntennaPod.Dark">
         <item name="windowActionBarOverlay">true</item>
     </style>
@@ -254,7 +280,7 @@
     </style>
 
     <style name="AntennaPod.TextView.ListItemPrimaryTitle" parent="@style/TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColor">@color/off_white_text</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
         <item name="lineHeight">20sp</item>
@@ -262,7 +288,7 @@
     </style>
 
     <style name="AntennaPod.TextView.ListItemSecondaryTitle" parent="@style/TextAppearance.Material3.BodyMedium">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textColor">@color/medium_gray_text</item>
         <item name="android:lines">1</item>
         <item name="android:ellipsize">end</item>
     </style>

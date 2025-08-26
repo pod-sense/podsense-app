@@ -28,6 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
+                android:clipChildren="false"
                 app:cardBackgroundColor="@color/non_square_icon_background"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
@@ -35,13 +36,29 @@
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="1px">
+                    android:layout_margin="1px"
+                    android:clipChildren="false">
 
+                    <!-- Extended colored background layer reaching to button area -->
+                    <View
+                        android:id="@+id/color_background"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignTop="@id/coverImage"
+                        android:layout_marginBottom="-50dp"
+                        android:background="@color/medium_gray" />
+
+                    <!-- Podcast cover with padding to show colored background -->
                     <de.danoeh.antennapod.ui.common.SquareImageView
                         android:id="@+id/coverImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_margin="4dp"
+                        android:layout_marginBottom="12dp"
                         android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/rounded_corners_8dp"
+                        android:clipToOutline="true"
                         android:outlineProvider="background"
                         squareImageView:direction="width"
                         tools:src="@tools:sample/avatars" />
@@ -63,12 +80,44 @@
                         android:textColor="#fff"
                         tools:text="@sample/episodes.json/data/title" />
 
+                    <!-- Play button at bottom left edge -->
+                    <ImageButton
+                        android:id="@+id/play_button"
+                        android:layout_width="32dp"
+                        android:layout_height="24dp"
+                        android:layout_alignBottom="@id/coverImage"
+                        android:layout_alignStart="@id/coverImage"
+                        android:layout_margin="4dp"
+                        android:background="@drawable/bg_pill_gray_translucent"
+                        android:src="@drawable/ic_play_24dp"
+                        android:contentDescription="@string/play_label"
+                        android:scaleType="centerInside"
+                        android:padding="4dp"
+                        app:tint="@color/white" />
+
+                    <!-- Options button (horizontal dots) at bottom right edge -->
+                    <ImageButton
+                        android:id="@+id/options_button"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignBottom="@id/coverImage"
+                        android:layout_alignEnd="@id/coverImage"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/dots_horizontal"
+                        android:contentDescription="@string/overflow_more"
+                        android:scaleType="centerInside"
+                        android:padding="4dp"
+                        app:tint="@color/white" />
+
                     <TextView
                         android:id="@+id/countViewPill"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="3"
                         android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="8dp"
                         android:textSize="14sp"
                         style="@style/TextPill" />
 
@@ -77,7 +126,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_alignParentEnd="true"
-                        android:layout_alignBottom="@id/coverImage"
+                        android:layout_alignParentTop="true"
                         android:layout_margin="8dp"
                         android:visibility="gone"
                         android:contentDescription="@string/refresh_failed_msg"
@@ -98,6 +147,8 @@
                 android:lines="2"
                 android:importantForAccessibility="no"
                 tools:text="@sample/episodes.json/data/title" />
+
+
 
         </LinearLayout>
 
