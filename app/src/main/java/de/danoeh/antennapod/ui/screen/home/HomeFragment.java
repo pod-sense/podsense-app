@@ -21,6 +21,8 @@ import de.danoeh.antennapod.ui.screen.download.CompletedDownloadsFragment;
 import de.danoeh.antennapod.ui.screen.queue.QueueFragment;
 import de.danoeh.antennapod.ui.screen.subscriptions.SubscriptionFragment;
 import de.danoeh.antennapod.model.feed.FeedItemFilter;
+import de.danoeh.antennapod.net.discovery.ItunesTopListLoader;
+import de.danoeh.antennapod.net.discovery.PodcastSearchResult;
 import de.danoeh.antennapod.net.download.serviceinterface.FeedUpdateManager;
 import de.danoeh.antennapod.storage.database.DBReader;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
@@ -30,6 +32,7 @@ import de.danoeh.antennapod.ui.screen.SearchFragment;
 import de.danoeh.antennapod.ui.view.LiftOnScrollListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.greenrobot.eventbus.EventBus;
@@ -37,6 +40,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+import java.util.Locale;
+import androidx.recyclerview.widget.RecyclerView;
+import de.danoeh.antennapod.ui.common.ThemeUtils;
 
 /**
  * Shows unread or recently published episodes
@@ -50,7 +56,8 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
     private static final String KEY_UP_ARROW = "up_arrow";
     private boolean displayUpArrow;
     private HomeFragmentBinding viewBinding;
-    private Disposable disposable;
+    private final CompositeDisposable disposable = new CompositeDisposable();
+    private Disposable welcomeScreenDisposable;
 
     @NonNull
     @Override
@@ -71,22 +78,53 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
                 FeedUpdateManager.getInstance().runOnceOrAsk(requireContext()));
 
         setupClickListeners();
+        loadAllCategories();
         return viewBinding.getRoot();
     }
 
     private void setupClickListeners() {
-        viewBinding.queueCard.setOnClickListener(v ->
-                ((MainActivity) getActivity()).loadChildFragment(new QueueFragment()));
-        viewBinding.inboxCard.setOnClickListener(v ->
-                ((MainActivity) getActivity()).loadChildFragment(new InboxFragment()));
-        viewBinding.downloadsCard.setOnClickListener(v ->
-                ((MainActivity) getActivity()).loadChildFragment(new CompletedDownloadsFragment()));
         viewBinding.subscriptionsCard.setOnClickListener(v ->
                 ((MainActivity) getActivity()).loadChildFragment(new SubscriptionFragment()));
-        viewBinding.surpriseCard.setOnClickListener(v ->
-                ((MainActivity) getActivity()).loadChildFragment(new AllEpisodesFragment()));
-        viewBinding.continueListeningCard.setOnClickListener(v ->
-                ((MainActivity) getActivity()).loadChildFragment(new QueueFragment()));
+        viewBinding.popularShowsArrow.setOnClickListener(v -> {
+            // TODO: Navigate to a full list of popular shows
+        });
+        viewBinding.newsArrow.setOnClickListener(v -> {
+            // TODO: Navigate to a full list of news shows
+        });
+        viewBinding.comedyArrow.setOnClickListener(v -> {
+            // TODO: Navigate to a full list of comedy shows
+        });
+        viewBinding.technologyArrow.setOnClickListener(v -> {
+            // TODO: Navigate to a full list of technology shows
+        });
+        viewBinding.businessArrow.setOnClickListener(v -> {
+            // TODO: Navigate to a full list of business shows
+        });
+    }
+
+    private void loadAllCategories() {
+        loadCategory(null, viewBinding.popularShowsRecycler);
+        loadCategory("1489", viewBinding.newsRecycler);
+        loadCategory("1303", viewBinding.comedyRecycler);
+        loadCategory("1318", viewBinding.technologyRecycler);
+        loadCategory("1321", viewBinding.businessRecycler);
+    }
+
+    private void loadCategory(String genre, RecyclerView recyclerView) {
+        disposable.add(Observable.fromCallable(() -> {
+                    ItunesTopListLoader loader = new ItunesTopListLoader(getContext());
+                    String country = Locale.getDefault().getCountry();
+                    if (country.isEmpty()) {
+                        country = "US";
+                    }
+                    return loader.loadToplist(country, genre, 12, DBReader.getFeedList());
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(podcastSearchResults -> {
+                    PopularPodcastAdapter adapter = new PopularPodcastAdapter(getContext(), podcastSearchResults);
+                    recyclerView.setAdapter(adapter);
+                }, error -> Log.e(TAG, "Error loading category: " + Log.getStackTraceString(error))));
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -122,6 +160,7 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+        disposable.clear();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -130,10 +169,10 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
     }
 
     private void updateWelcomeScreenVisibility() {
-        if (disposable != null) {
-            disposable.dispose();
+        if (welcomeScreenDisposable != null) {
+            welcomeScreenDisposable.dispose();
         }
-        disposable = Observable.fromCallable(() -> DBReader.getTotalEpisodeCount(FeedItemFilter.unfiltered()))
+        welcomeScreenDisposable = Observable.fromCallable(() -> DBReader.getTotalEpisodeCount(FeedItemFilter.unfiltered()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(numEpisodes -> {
@@ -146,6 +185,7 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
                         viewBinding.homeScrollView.setScrollY(0);
                     }
                 }, error -> Log.e(TAG, Log.getStackTraceString(error)));
+        disposable.add(welcomeScreenDisposable);
     }
 
 }

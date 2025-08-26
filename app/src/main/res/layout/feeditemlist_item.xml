@@ -210,9 +210,27 @@
 
         </LinearLayout>
 
-        <include
-            android:id="@+id/secondaryActionButton"
-            layout="@layout/secondary_action" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="end|center_vertical">
+
+            <ImageButton
+                android:id="@+id/butPlay"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/play_label"
+                android:src="@drawable/ic_play_24dp"
+                app:tint="?attr/action_icon_color" />
+
+            <include
+                android:id="@+id/secondaryActionButton"
+                layout="@layout/secondary_action" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
