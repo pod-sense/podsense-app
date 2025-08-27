@@ -17,58 +17,55 @@
         android:gravity="bottom">
 
         <LinearLayout
+            android:id="@+id/buttonContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="56dp"
             android:background="@color/image_readability_tint"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_alignParentBottom="true">
 
             <View
-                android:layout_width="148dp"
-                android:layout_height="match_parent" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/butSubscribe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/subscribe_label"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:layout_marginVertical="4dp"
+                android:minWidth="88dp"
+                android:minHeight="36dp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/follow_button_background"
+                android:alpha="1.0"
+                android:enabled="true"
+                android:textAllCaps="true"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
                 tools:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/butShowInfo"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/show_info_label"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginStart="-4dp"
-                android:scaleType="fitXY"
-                android:padding="12dp"
-                app:srcCompat="@drawable/ic_info_white"
-                tools:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/butFilter"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/filter"
-                android:scaleType="fitXY"
-                android:padding="12dp"
-                app:srcCompat="@drawable/ic_filter_white"
-                tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/butShowSettings"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="?attr/selectableItemBackground"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:background="@android:color/holo_blue_light"
                 android:contentDescription="@string/show_feed_settings_label"
                 android:scaleType="fitXY"
                 android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:enabled="true"
                 app:srcCompat="@drawable/ic_settings_white"
                 tools:visibility="visible" />
 

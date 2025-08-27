@@ -114,16 +114,19 @@ public class FeedItemlistFragment extends Fragment implements AdapterView.OnItem
      * @return the newly created instance of an ItemlistFragment
      */
     public static FeedItemlistFragment newInstance(long feedId) {
+        Log.d("FeedItemlistFragment", "newInstance called with feedId: " + feedId);
         FeedItemlistFragment i = new FeedItemlistFragment();
         Bundle b = new Bundle();
         b.putLong(ARGUMENT_FEED_ID, feedId);
         i.setArguments(b);
+        Log.d("FeedItemlistFragment", "FeedItemlistFragment instance created");
         return i;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("FeedItemlistFragment", "onCreate called - fragment initializing");
 
         Bundle args = getArguments();
         Objects.requireNonNull(args);
@@ -134,6 +137,7 @@ public class FeedItemlistFragment extends Fragment implements AdapterView.OnItem
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d("FeedItemlistFragment", "onCreateView called - creating fragment view");
         viewBinding = FeedItemListFragmentBinding.inflate(inflater);
         viewBinding.toolbar.inflateMenu(R.menu.feedlist);
         viewBinding.toolbar.setOnMenuItemClickListener(this);
@@ -505,13 +509,9 @@ public class FeedItemlistFragment extends Fragment implements AdapterView.OnItem
         }
         viewBinding.header.txtvTitle.setText(feed.getTitle());
         viewBinding.header.txtvAuthor.setText(feed.getAuthor());
+        // Keep description container always hidden to prevent layout jumping
         viewBinding.header.descriptionContainer.setVisibility(View.GONE);
-        if (feed.getState() != Feed.STATE_SUBSCRIBED) {
-            viewBinding.header.descriptionContainer.setVisibility(View.VISIBLE);
-            viewBinding.header.headerDescriptionLabel.setText(HtmlToPlainText.getPlainText(feed.getDescription()));
-            viewBinding.header.subscribeNagLabel.setVisibility(
-                    feed.hasInteractedWithEpisode() ? View.VISIBLE : View.GONE);
-        } else if (feed.getItemFilter() != null) {
+        if (feed.getItemFilter() != null) {
             FeedItemFilter filter = feed.getItemFilter();
             if (filter.getValues().length > 0) {
                 viewBinding.header.txtvInformation.setText(R.string.filtered_label);
@@ -525,10 +525,20 @@ public class FeedItemlistFragment extends Fragment implements AdapterView.OnItem
             viewBinding.header.txtvInformation.setVisibility(View.GONE);
         }
         boolean isSubscribed = feed.getState() == Feed.STATE_SUBSCRIBED;
-        viewBinding.header.butShowInfo.setVisibility(isSubscribed ? View.VISIBLE : View.GONE);
-        viewBinding.header.butFilter.setVisibility(isSubscribed ? View.VISIBLE : View.GONE);
-        viewBinding.header.butShowSettings.setVisibility(isSubscribed ? View.VISIBLE : View.GONE);
-        viewBinding.header.butSubscribe.setVisibility(isSubscribed ? View.GONE : View.VISIBLE);
+        // Keep remaining buttons always visible to prevent layout shifts
+        viewBinding.header.butShowSettings.setVisibility(View.VISIBLE);
+
+        // SUBSCRIBE BUTTON: Always visible and enabled for toggling
+        // Users should be able to follow/unfollow freely
+        updateSubscribeButton(isSubscribed);
+
+        // Multiple safeguards to ensure button stays visible and functional
+        viewBinding.header.butSubscribe.post(() -> {
+            if (viewBinding != null && viewBinding.header != null && viewBinding.header.butSubscribe != null) {
+                boolean currentIsSubscribed = feed.getState() == Feed.STATE_SUBSCRIBED;
+                updateSubscribeButton(currentIsSubscribed);
+            }
+        });
 
         if (!isSubscribed && feed.getLastRefreshAttempt() < System.currentTimeMillis() - 1000L * 3600 * 24) {
             FeedUpdateManager.getInstance().runOnce(getContext(), feed, true);
@@ -538,32 +548,106 @@ public class FeedItemlistFragment extends Fragment implements AdapterView.OnItem
     private void setupHeaderView() {
         // https://github.com/bumptech/glide/issues/529
         viewBinding.imgvBackground.setColorFilter(new LightingColorFilter(0xff666666, 0x000000));
-        viewBinding.header.butShowInfo.setOnClickListener(v -> showFeedInfo());
+
         viewBinding.header.imgvCover.setOnClickListener(v -> showFeedInfo());
         viewBinding.header.headerDescriptionLabel.setOnClickListener(v -> showFeedInfo());
+
+        // CRITICAL: Ensure the subscribe button AND its container are ALWAYS visible
+        // Set initial state - button is always enabled for toggling
+        if (feed != null) {
+            boolean isSubscribed = feed.getState() == Feed.STATE_SUBSCRIBED;
+            updateSubscribeButton(isSubscribed);
+        }
         viewBinding.header.butSubscribe.setOnClickListener(view -> {
             if (feed == null) {
                 return;
             }
-            DBWriter.setFeedState(getContext(), feed, Feed.STATE_SUBSCRIBED);
-            MainActivityStarter mainActivityStarter = new MainActivityStarter(getContext());
-            mainActivityStarter.withOpenFeed(feed.getId());
-            getActivity().finish();
-            startActivity(mainActivityStarter.getIntent());
+
+            boolean isCurrentlySubscribed = feed.getState() == Feed.STATE_SUBSCRIBED;
+            if (isCurrentlySubscribed) {
+                // Unfollow: change from Following to Follow
+                DBWriter.setFeedState(getContext(), feed, Feed.STATE_NOT_SUBSCRIBED);
+                // Immediately update button appearance
+                viewBinding.header.butSubscribe.setText(R.string.subscribe_label);
+                viewBinding.header.butSubscribe.setSelected(false);
+            } else {
+                // Follow: change from Follow to Following
+                DBWriter.setFeedState(getContext(), feed, Feed.STATE_SUBSCRIBED);
+                // Immediately update button appearance
+                viewBinding.header.butSubscribe.setText(R.string.following_label);
+                viewBinding.header.butSubscribe.setSelected(true);
+            }
+
+            // Ensure button stays visible after state change
+            viewBinding.header.buttonContainer.setVisibility(View.VISIBLE);
+            viewBinding.header.butSubscribe.setVisibility(View.VISIBLE);
         });
+    }
+
+    /**
+     * Updates the subscribe button state with proper visual styling
+     * @param isSubscribed Whether the feed is currently subscribed/followed
+     */
+    private void updateSubscribeButton(boolean isSubscribed) {
+        if (viewBinding == null || viewBinding.header == null || viewBinding.header.butSubscribe == null) {
+            return;
+        }
+
+        // Ensure button is always visible and properly styled
+        viewBinding.header.buttonContainer.setVisibility(View.VISIBLE);
+        viewBinding.header.butSubscribe.setVisibility(View.VISIBLE);
+
+        // Set button text based on subscription state
+        viewBinding.header.butSubscribe.setText(isSubscribed ? R.string.following_label : R.string.subscribe_label);
+
+        // Set button selected state for proper background color
+        viewBinding.header.butSubscribe.setSelected(isSubscribed);
+
+        // Ensure button is always enabled for toggling
+        viewBinding.header.butSubscribe.setEnabled(true);
+
+        // Force full opacity and proper visual state
+        viewBinding.header.butSubscribe.setAlpha(1.0f);
+        viewBinding.header.butSubscribe.setClickable(true);
+        viewBinding.header.butSubscribe.setFocusable(true);
+    }
+
+    private void setupOtherButtons() {
+        Log.d("FeedItemlistFragment", "Setting up other buttons - this should appear on fragment creation");
+
+        // Add a click listener to the entire button container to test touch events
+        viewBinding.header.buttonContainer.setOnClickListener(v ->
+            Log.d("FeedItemlistFragment", "Button container clicked - touch events working"));
+
+        // Ensure settings button is clickable and enabled
+        viewBinding.header.butShowSettings.setEnabled(true);
+        viewBinding.header.butShowSettings.setClickable(true);
+        viewBinding.header.butShowSettings.setVisibility(View.VISIBLE);
+        Log.d("FeedItemlistFragment", "Settings button visibility: " + viewBinding.header.butShowSettings.getVisibility() +
+              ", enabled: " + viewBinding.header.butShowSettings.isEnabled() +
+              ", clickable: " + viewBinding.header.butShowSettings.isClickable());
+
         viewBinding.header.butShowSettings.setOnClickListener(v -> {
-            if (feed == null) {
-                return;
+            try {
+                Log.d("FeedItemlistFragment", "Settings button clicked - button is enabled: " + v.isEnabled() + ", clickable: " + v.isClickable());
+                if (feed == null) {
+                    Log.d("FeedItemlistFragment", "Feed is null, cannot open settings");
+                    return;
+                }
+                Log.d("FeedItemlistFragment", "Opening settings for feed: " + feed.getTitle());
+                FeedSettingsFragment fragment = FeedSettingsFragment.newInstance(feed);
+                MainActivity activity = (MainActivity) getActivity();
+                if (activity != null) {
+                    activity.loadChildFragment(fragment, TransitionEffect.SLIDE);
+                    Log.d("FeedItemlistFragment", "Settings fragment loaded successfully");
+                } else {
+                    Log.d("FeedItemlistFragment", "MainActivity is null");
+                }
+            } catch (Exception e) {
+                Log.e("FeedItemlistFragment", "Error loading settings fragment", e);
             }
-            FeedSettingsFragment fragment = FeedSettingsFragment.newInstance(feed);
-            ((MainActivity) getActivity()).loadChildFragment(fragment, TransitionEffect.SLIDE);
         });
-        viewBinding.header.butFilter.setOnClickListener(v -> {
-            if (feed == null) {
-                return;
-            }
-            FeedItemFilterDialog.newInstance(feed).show(getChildFragmentManager(), null);
-        });
+
         viewBinding.header.txtvFailure.setOnClickListener(v -> showErrorDetails());
         viewBinding.header.txtvAuthor.setOnLongClickListener(view -> {
             copyToClipboard(requireContext(), viewBinding.header.txtvAuthor.getText().toString());

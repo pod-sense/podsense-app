@@ -90,12 +90,23 @@ public class OnlineFeedViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("OnlineFeedViewActivity", "onCreate called - activity starting");
         setTheme(ThemeSwitcher.getTranslucentTheme(this));
         super.onCreate(savedInstanceState);
 
         viewBinding = OnlinefeedviewActivityBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
-        viewBinding.transparentBackground.setOnClickListener(v -> finish());
+
+        // Add touch test to the card container
+        viewBinding.card.setOnTouchListener((v, event) -> {
+            Log.d("OnlineFeedViewActivity", "Card touched - action: " + event.getAction());
+            return false; // Don't consume the event
+        });
+
+        viewBinding.transparentBackground.setOnClickListener(v -> {
+            Log.d("OnlineFeedViewActivity", "Transparent background clicked - finishing activity");
+            finish();
+        });
         viewBinding.card.setOnClickListener(null);
         viewBinding.card.setCardBackgroundColor(ThemeUtils.getColorFromAttr(this, R.attr.colorSurface));
 
@@ -235,11 +246,9 @@ public class OnlineFeedViewActivity extends AppCompatActivity {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(subscribedFeed -> {
-            if (subscribedFeed.getState() == Feed.STATE_SUBSCRIBED) {
-                openFeed(subscribedFeed.getId());
-            } else {
-                showFeedFragment(subscribedFeed.getId());
-            }
+            // Always show the feed fragment - whether subscribed or not
+            // The FeedItemlistFragment will handle showing/hiding the follow button appropriately
+            showFeedFragment(subscribedFeed.getId());
         }, error -> Log.e(TAG, Log.getStackTraceString(error)), () -> startFeedDownload(url));
         return null;
     }
@@ -358,20 +367,16 @@ public class OnlineFeedViewActivity extends AppCompatActivity {
         }
 
         viewBinding.progressBar.setVisibility(View.GONE);
+        Log.d("OnlineFeedViewActivity", "Loading FeedItemlistFragment for feed ID: " + id);
         FeedItemlistFragment fragment = FeedItemlistFragment.newInstance(id);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, fragment, FeedItemlistFragment.TAG)
                 .commitAllowingStateLoss();
+        Log.d("OnlineFeedViewActivity", "FeedItemlistFragment loaded successfully");
     }
 
-    private void openFeed(long feedId) {
-        // feed.getId() is always 0, we have to retrieve the id from the feed list from the database
-        MainActivityStarter mainActivityStarter = new MainActivityStarter(this);
-        mainActivityStarter.withOpenFeed(feedId);
-        finish();
-        startActivity(mainActivityStarter.getIntent());
-    }
+
 
     @UiThread
     private void showErrorDialog(String errorMsg, String details) {

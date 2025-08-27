@@ -29,6 +29,7 @@ public class FeedSettingsFragment extends Fragment {
     private Disposable disposable;
 
     public static FeedSettingsFragment newInstance(Feed feed) {
+        Log.d(TAG, "Creating FeedSettingsFragment for feed: " + feed.getTitle() + " (ID: " + feed.getId() + ")");
         FeedSettingsFragment fragment = new FeedSettingsFragment();
         Bundle arguments = new Bundle();
         arguments.putLong(EXTRA_FEED_ID, feed.getId());
@@ -40,16 +41,23 @@ public class FeedSettingsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "FeedSettingsFragment onCreateView called");
         View root = inflater.inflate(R.layout.feedsettings, container, false);
         long feedId = getArguments().getLong(EXTRA_FEED_ID);
+        Log.d(TAG, "FeedSettingsFragment loading settings for feed ID: " + feedId);
 
         MaterialToolbar toolbar = root.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
 
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.settings_fragment_container,
-                        FeedSettingsPreferenceFragment.newInstance(feedId), "settings_fragment")
-                .commitAllowingStateLoss();
+        try {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.settings_fragment_container,
+                            FeedSettingsPreferenceFragment.newInstance(feedId), "settings_fragment")
+                    .commitAllowingStateLoss();
+            Log.d(TAG, "Settings preference fragment loaded successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading settings preference fragment", e);
+        }
 
         disposable = Maybe.create((MaybeOnSubscribe<Feed>) emitter -> {
             Feed feed = DBReader.getFeed(feedId, false, 0, 0);

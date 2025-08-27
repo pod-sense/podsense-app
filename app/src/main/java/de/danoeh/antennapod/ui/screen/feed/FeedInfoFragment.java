@@ -104,9 +104,7 @@ public class FeedInfoFragment extends Fragment implements MaterialToolbar.OnMenu
                 new ToolbarIconTintManager(viewBinding.toolbar, viewBinding.collapsingToolbar);
         viewBinding.appBar.addOnOffsetChangedListener(iconTintManager);
 
-        viewBinding.header.butShowInfo.setVisibility(View.INVISIBLE);
         viewBinding.header.butShowSettings.setVisibility(View.INVISIBLE);
-        viewBinding.header.butFilter.setVisibility(View.INVISIBLE);
         // https://github.com/bumptech/glide/issues/529
         viewBinding.imgvBackground.setColorFilter(new LightingColorFilter(0xff828282, 0x000000));
         viewBinding.urlLabel.setOnClickListener(copyUrlToClipboard);
